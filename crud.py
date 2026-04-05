@@ -87,3 +87,12 @@ def create_availability(db: Session, availability):
     db.commit()
     db.refresh(new_av)
     return new_av
+
+def get_appointments(db: Session):
+    return db.query(models.Appointment).all()
+
+
+def get_appointments_by_doctor(db: Session, doctor_id: int):
+    return db.query(models.Appointment).filter(
+        models.Appointment.doctor_id == doctor_id
+    ).all()
