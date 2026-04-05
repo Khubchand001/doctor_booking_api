@@ -27,3 +27,10 @@ class RatingCreate(BaseModel):
     doctor_id: int
     stars: int
     comment: str
+
+class AvailabilityCreate(BaseModel):
+    doctor_id: int
+    day: str
+    start_time: str
+    end_time: str
+
