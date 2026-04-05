@@ -57,10 +57,9 @@ def create_appointment(db: Session, appointment):
 
 
 def get_available_slots(db: Session, doctor_id, date):
-
-    # Get doctor availability
     availability = db.query(models.Availability).filter(
-        models.Availability.doctor_id == doctor_id
+        models.Availability.doctor_id == doctor_id,
+        models.Availability.date == date
     ).first()
 
     if not availability:
@@ -74,14 +73,12 @@ def get_available_slots(db: Session, doctor_id, date):
         slots.append(f"{hour:02d}:00")
         slots.append(f"{hour:02d}:30")
 
-    # Get booked slots
     booked = db.query(models.Appointment).filter(
         models.Appointment.doctor_id == doctor_id,
         models.Appointment.date == date
     ).all()
 
     booked_times = [b.time for b in booked]
-
     return [s for s in slots if s not in booked_times]
 
 def create_availability(db: Session, availability):

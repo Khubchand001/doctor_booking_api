@@ -51,6 +51,6 @@ class Availability(Base):
 
     id = Column(Integer, primary_key=True)
     doctor_id = Column(Integer)
-    day = Column(String)
+    date = Column(String)
     start_time = Column(String)
     end_time = Column(String)

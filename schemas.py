@@ -30,7 +30,7 @@ class RatingCreate(BaseModel):
 
 class AvailabilityCreate(BaseModel):
     doctor_id: int
-    day: str
-    start_time: str
+    date: str
+    start_time: str     
     end_time: str
 
