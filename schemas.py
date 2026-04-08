@@ -39,3 +39,16 @@ class AvailabilityCreate(BaseModel):
     date: str
     start_time: str
     end_time: str
+
+
+class RatingCreate(BaseModel):
+    doctor_id: int
+    stars: int
+    comment: str
+
+
+class RatingResponse(RatingCreate):
+    id: int
+
+    class Config:
+        from_attributes = True

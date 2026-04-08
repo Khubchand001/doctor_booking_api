@@ -1,30 +1,24 @@
-import os
 from fastapi import APIRouter, UploadFile, File
 import shutil
+import os
 
-router = APIRouter()
+router = APIRouter(prefix="/uploads", tags=["Uploads"])
 
 UPLOAD_DIR = "uploads"
-
-# ✅ create folder automatically
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-@router.post("/upload")
+@router.post("/image")
 def upload_image(file: UploadFile = File(...)):
     path = f"{UPLOAD_DIR}/{file.filename}"
-
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-
     return {"image_url": path}
 
 
-@router.post("/upload-pdf")
+@router.post("/pdf")
 def upload_pdf(file: UploadFile = File(...)):
     path = f"{UPLOAD_DIR}/{file.filename}"
-
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-
     return {"file_url": path}

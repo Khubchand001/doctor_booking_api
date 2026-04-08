@@ -6,20 +6,17 @@ import crud, schemas
 router = APIRouter(prefix="/appointments", tags=["Appointments"])
 
 
-@router.post("/", response_model=schemas.AppointmentResponse)
+@router.post("/")
 def book_appointment(app: schemas.AppointmentCreate, db: Session = Depends(get_db)):
-    try:
-        return crud.create_appointment(db, app)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return crud.create_appointment(db, app)
 
 
-@router.get("/", response_model=list[schemas.AppointmentResponse])
+@router.get("/")
 def all_appointments(db: Session = Depends(get_db)):
     return crud.get_appointments(db)
 
 
-@router.get("/{doctor_id}", response_model=list[schemas.AppointmentResponse])
+@router.get("/doctor/{doctor_id}")
 def doctor_appointments(doctor_id: int, db: Session = Depends(get_db)):
     return crud.get_appointments_by_doctor(db, doctor_id)
 

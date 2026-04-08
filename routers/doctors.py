@@ -1,24 +1,27 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-import os
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from database import get_db
+import crud, schemas
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'doctor.db')}"
-
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
+router = APIRouter(prefix="/doctors", tags=["Doctors"])
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@router.post("/")
+def add_doctor(doctor: schemas.DoctorCreate, db: Session = Depends(get_db)):
+    return crud.create_doctor(db, doctor)
+
+
+@router.get("/")
+def list_doctors(db: Session = Depends(get_db)):
+    return crud.get_doctors(db)
+
+
+@router.get("/{doctor_id}")
+def doctor_profile(doctor_id: int, db: Session = Depends(get_db)):
+    doctor = crud.get_doctor(db, doctor_id)
+    rating = crud.calculate_rating(db, doctor_id)
+
+    return {
+        "doctor": doctor,
+        "average_rating": rating
+    }
