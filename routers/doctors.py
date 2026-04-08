@@ -1,43 +1,24 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from database import get_db
-import crud, schemas
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+import os
 
-router = APIRouter()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'doctor.db')}"
 
-# ---------------- DOCTOR APIs ---------------- #
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False}
+)
 
-@router.post("/doctors")
-def add_doctor(doctor: schemas.DoctorCreate, db: Session = Depends(get_db)):
-    return crud.create_doctor(db, doctor)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-@router.get("/doctors")
-def list_doctors(db: Session = Depends(get_db)):
-    return crud.get_doctors(db)
+Base = declarative_base()
 
 
-@router.get("/doctor/{doctor_id}")
-def doctor_profile(doctor_id: int, db: Session = Depends(get_db)):
-    doctor = crud.get_doctor(db, doctor_id)
-    rating = crud.calculate_rating(db, doctor_id)
-
-    return {
-        "doctor": doctor,
-        "average_rating": rating
-    }
-
-
-# ---------------- NEW: AVAILABILITY APIs ---------------- #
-
-@router.post("/availability")
-def add_availability(data: schemas.AvailabilityCreate, db: Session = Depends(get_db)):
-    return crud.create_availability(db, data)
-
-
-@router.get("/availability/{doctor_id}")
-def get_availability(doctor_id: int, db: Session = Depends(get_db)):
-    return db.query(crud.models.Availability).filter(
-        crud.models.Availability.doctor_id == doctor_id
-    ).all()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
