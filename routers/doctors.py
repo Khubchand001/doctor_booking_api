@@ -1,5 +1,4 @@
-from fastapi import HTTPException
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 import crud, schemas
@@ -7,33 +6,24 @@ import crud, schemas
 router = APIRouter(prefix="/doctors", tags=["Doctors"])
 
 
+# ✅ 1. GET ALL DOCTORS (MAIN API)
+@router.get("")
+def get_all_doctors(db: Session = Depends(get_db)):
+    return crud.get_doctors(db)
 
 
+# ✅ 2. GET SINGLE DOCTOR (OPTIONAL)
 @router.get("/{doctor_id}")
-def doctor_profile(doctor_id: int, db: Session = Depends(get_db)):
+def get_doctor(doctor_id: int, db: Session = Depends(get_db)):
+    doctor = crud.get_doctor(db, doctor_id)
 
-    data = crud.get_doctor_full_profile(db, doctor_id)
-
-    if not data:
+    if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
 
-    doctor = data["doctor"]
+    return doctor
 
-    return {
-        "doctor": {
-            "id": doctor.id,
-            "name": doctor.name,
-            "specialization": doctor.specialization,
-            "experience": doctor.experience,
-            "image": doctor.image
-        },
-        "total_appointments": data["total_appointments"],
-        "appointments": [
-            {
-                "patient_name": a.patient_name,
-                "date": a.date,
-                "time": a.time
-            } for a in data["appointments"]
-        ],
-        "average_rating": data["average_rating"]
-    }
+
+# ✅ 3. ADD DOCTOR
+@router.post("")
+def add_doctor(doctor: schemas.DoctorCreate, db: Session = Depends(get_db)):
+    return crud.create_doctor(db, doctor)

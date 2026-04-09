@@ -121,8 +121,11 @@ def get_doctor_full_profile(db: Session, doctor_id: int):
     rating = calculate_rating(db, doctor_id)
 
     return {
-        "doctor": doctor,
-        "appointments": appointments,
-        "total_appointments": len(appointments),
-        "average_rating": rating
-    }
+            "doctor": doctor,
+            "appointments": appointments,
+            "total_appointments": len(appointments),
+            "average_rating": rating
+        }
+    
+def get_doctors(db: Session):
+        return db.query(models.Doctor).all()

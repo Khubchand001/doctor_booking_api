@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from database import engine
 import models
-
+from fastapi.middleware.cors import CORSMiddleware
 from routers import doctors, appointments, ratings, upload, availability
 from fastapi.staticfiles import StaticFiles
 from routers import analytics
@@ -18,3 +18,11 @@ app.include_router(ratings.router)
 app.include_router(upload.router)
 app.include_router(availability.router)
 app.include_router(analytics.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # dev ke liye
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
