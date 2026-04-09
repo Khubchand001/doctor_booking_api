@@ -3,3 +3,7 @@ uvicorn
 sqlalchemy
 pydantic
 python-multipart
+pandas
+openpyxl
+python-jose 
+passlib[bcrypt]

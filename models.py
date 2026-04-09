@@ -59,4 +59,5 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
     password = Column(String)
-    role = Column(String)  # admin / user
+    role = Column(String)  # admin / doctor
+    doctor_id = Column(Integer, nullable=True)  # link doctor

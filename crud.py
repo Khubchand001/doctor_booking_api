@@ -129,3 +129,13 @@ def get_doctor_full_profile(db: Session, doctor_id: int):
     
 def get_doctors(db: Session):
         return db.query(models.Doctor).all()
+
+def delete_appointment(db: Session, appointment_id: int):
+    app = db.query(models.Appointment).filter(
+        models.Appointment.id == appointment_id
+    ).first()
+
+    if app:
+        db.delete(app)
+        db.commit()
+    return app
