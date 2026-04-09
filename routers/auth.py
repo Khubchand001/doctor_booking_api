@@ -4,6 +4,8 @@ from database import get_db
 from jose import jwt
 from passlib.context import CryptContext
 import models
+import schemas
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -35,19 +37,24 @@ def login(username: str, password: str, db: Session = Depends(get_db)):
     return {"access_token": token}
 
 @router.post("/register-admin")
-def register_admin(username: str, password: str, db: Session = Depends(get_db)):
-    from passlib.context import CryptContext
-    pwd_context = CryptContext(schemes=["bcrypt"])
+def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
-    hashed = pwd_context.hash(password)
+    existing = db.query(models.User).filter(
+        models.User.username == user.username
+    ).first()
 
-    user = models.User(
-        username=username,
+    if existing:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    hashed = pwd_context.hash(user.password[:72])  # ✅ SAFE LIMIT
+
+    new_user = models.User(
+        username=user.username,
         password=hashed,
         role="admin"
     )
 
-    db.add(user)
+    db.add(new_user)
     db.commit()
 
     return {"message": "Admin created"}

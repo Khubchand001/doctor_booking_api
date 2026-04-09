@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from database import engine
+from database import Base, engine
 import models
 from fastapi.middleware.cors import CORSMiddleware
 from routers import doctors, appointments, ratings, upload, availability
@@ -30,5 +30,5 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    
+
 )

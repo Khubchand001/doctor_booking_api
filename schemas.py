@@ -2,6 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+
 class DoctorCreate(BaseModel):
     name: str
     specialization: str
@@ -62,3 +63,7 @@ class DoctorResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
