@@ -33,3 +33,21 @@ def login(username: str, password: str, db: Session = Depends(get_db)):
     )
 
     return {"access_token": token}
+
+@router.post("/register-admin")
+def register_admin(username: str, password: str, db: Session = Depends(get_db)):
+    from passlib.context import CryptContext
+    pwd_context = CryptContext(schemes=["bcrypt"])
+
+    hashed = pwd_context.hash(password)
+
+    user = models.User(
+        username=username,
+        password=hashed,
+        role="admin"
+    )
+
+    db.add(user)
+    db.commit()
+
+    return {"message": "Admin created"}
