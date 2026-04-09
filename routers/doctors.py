@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
@@ -6,22 +7,33 @@ import crud, schemas
 router = APIRouter(prefix="/doctors", tags=["Doctors"])
 
 
-@router.post("/")
-def add_doctor(doctor: schemas.DoctorCreate, db: Session = Depends(get_db)):
-    return crud.create_doctor(db, doctor)
-
-
-@router.get("/")
-def list_doctors(db: Session = Depends(get_db)):
-    return crud.get_doctors(db)
 
 
 @router.get("/{doctor_id}")
 def doctor_profile(doctor_id: int, db: Session = Depends(get_db)):
-    doctor = crud.get_doctor(db, doctor_id)
-    rating = crud.calculate_rating(db, doctor_id)
+
+    data = crud.get_doctor_full_profile(db, doctor_id)
+
+    if not data:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+
+    doctor = data["doctor"]
 
     return {
-        "doctor": doctor,
-        "average_rating": rating
+        "doctor": {
+            "id": doctor.id,
+            "name": doctor.name,
+            "specialization": doctor.specialization,
+            "experience": doctor.experience,
+            "image": doctor.image
+        },
+        "total_appointments": data["total_appointments"],
+        "appointments": [
+            {
+                "patient_name": a.patient_name,
+                "date": a.date,
+                "time": a.time
+            } for a in data["appointments"]
+        ],
+        "average_rating": data["average_rating"]
     }

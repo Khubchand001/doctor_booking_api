@@ -12,8 +12,10 @@ def create_doctor(db: Session, doctor):
     return new_doc
 
 
-def get_doctors(db: Session):
-    return db.query(models.Doctor).all()
+def get_doctor(db: Session, doctor_id: int):
+    return db.query(models.Doctor).filter(
+        models.Doctor.id == doctor_id
+    ).first()
 
 
 # ---------------- APPOINTMENT ---------------- #
@@ -91,4 +93,36 @@ def get_available_slots(db: Session, doctor_id, date):
         "total_slots": slots,
         "booked": booked_times,
         "available": available
+    }
+def calculate_rating(db: Session, doctor_id: int):
+    ratings = db.query(models.Rating).filter(
+        models.Rating.doctor_id == doctor_id
+    ).all()
+
+    if not ratings:
+        return 0
+
+    avg = sum(r.stars for r in ratings) / len(ratings)
+
+    return round(avg, 2)
+
+def get_doctor_full_profile(db: Session, doctor_id: int):
+    doctor = db.query(models.Doctor).filter(
+        models.Doctor.id == doctor_id
+    ).first()
+
+    if not doctor:
+        return None
+
+    appointments = db.query(models.Appointment).filter(
+        models.Appointment.doctor_id == doctor_id
+    ).all()
+
+    rating = calculate_rating(db, doctor_id)
+
+    return {
+        "doctor": doctor,
+        "appointments": appointments,
+        "total_appointments": len(appointments),
+        "average_rating": rating
     }

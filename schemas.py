@@ -52,3 +52,13 @@ class RatingResponse(RatingCreate):
 
     class Config:
         from_attributes = True
+
+class DoctorResponse(BaseModel):
+    id: int
+    name: str
+    specialization: str
+    experience: str
+    image: str
+
+    class Config:
+        from_attributes = True

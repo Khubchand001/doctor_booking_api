@@ -18,16 +18,13 @@ class Doctor(Base):
 
 
 class Rating(Base):
-
     __tablename__ = "ratings"
 
     id = Column(Integer, primary_key=True)
     doctor_id = Column(Integer, ForeignKey("doctors.id"))
     stars = Column(Integer)
     comment = Column(String)
-
-    doctor = relationship("Doctor", back_populates="ratings")
-
+    doctor = relationship("Doctor", back_populates="ratings") 
 
 class Appointment(Base):
 
@@ -54,3 +51,12 @@ class Availability(Base):
     date = Column(String)
     start_time = Column(String)
     end_time = Column(String)
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True)
+    password = Column(String)
+    role = Column(String)  # admin / user
