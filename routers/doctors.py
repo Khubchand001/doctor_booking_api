@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 import crud, schemas
+from dependencies import admin_required, doctor_required, get_current_user
 
 router = APIRouter(prefix="/doctors", tags=["Doctors"])
 
@@ -23,7 +24,31 @@ def get_doctor(doctor_id: int, db: Session = Depends(get_db)):
     return doctor
 
 
-# ✅ 3. ADD DOCTOR
-@router.post("")
+# ✅ 3. ADD DOCTOR (Admin only)
+@router.post("", dependencies=[Depends(admin_required)])
 def add_doctor(doctor: schemas.DoctorCreate, db: Session = Depends(get_db)):
     return crud.create_doctor(db, doctor)
+
+
+# ✅ 4. UPDATE OWN PROFILE (Doctor only)
+@router.patch("/profile")
+def update_profile(
+    profile: schemas.DoctorUpdate, 
+    user=Depends(doctor_required), 
+    db: Session = Depends(get_db)
+):
+    doctor_id = user["doctor_id"]
+    if not doctor_id:
+        raise HTTPException(status_code=400, detail="User is not linked to any doctor profile")
+        
+    db_doctor = crud.get_doctor(db, doctor_id)
+    if not db_doctor:
+        raise HTTPException(status_code=404, detail="Doctor profile not found")
+        
+    # Update fields
+    for field, value in profile.dict(exclude_unset=True).items():
+        setattr(db_doctor, field, value)
+        
+    db.commit()
+    db.refresh(db_doctor)
+    return db_doctor

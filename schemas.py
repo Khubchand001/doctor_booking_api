@@ -67,3 +67,23 @@ class DoctorResponse(BaseModel):
 class UserCreate(BaseModel):
     username: str
     password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class DashboardActivities(BaseModel):
+    paitent_inflow: int
+    doctor_availability: int
+    resource_usage: int
+
+class UserMe(BaseModel):
+    username: str
+    role: str
+    doctor_id: Optional[int] = None
+
+class DoctorUpdate(BaseModel):
+    name: Optional[str] = None
+    specialization: Optional[str] = None
+    experience: Optional[str] = None
+    image: Optional[str] = None

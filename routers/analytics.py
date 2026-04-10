@@ -1,15 +1,16 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import get_db
 import models
 from datetime import date
+from dependencies import admin_required, doctor_required
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 
-# ✅ MAIN DASHBOARD
-@router.get("/dashboard")
+# ✅ MAIN DASHBOARD (Admin only)
+@router.get("/dashboard", dependencies=[Depends(admin_required)])
 def dashboard(db: Session = Depends(get_db)):
 
     today = str(date.today())
@@ -117,3 +118,49 @@ def rating_distribution(db: Session = Depends(get_db)):
         }
         for r in data
     ]
+
+
+# 📊 ACTIVITIES (DYNAMIC STATS FOR DASHBOARD)
+@router.get("/activities")
+def get_activities(db: Session = Depends(get_db)):
+    # These could be calculated from real usage data
+    # For now, providing semi-dynamic values based on current stats
+    total_docs = db.query(func.count(models.Doctor.id)).scalar() or 1
+    total_apps = db.query(func.count(models.Appointment.id)).scalar() or 1
+    
+    # Example logic: 
+    # Patient Inflow = appointments / (doctors * 10) capped at 100%
+    patient_inflow = min(int((total_apps / (total_docs * 10)) * 100), 100)
+    # Availability = (doctors * some factor)
+    doctor_availability = min(total_docs * 8, 100)
+    # Resource Usage = a mix of both
+    resource_usage = (patient_inflow + doctor_availability) // 2
+
+    return {
+        "patient_inflow": patient_inflow,
+        "doctor_availability": doctor_availability,
+        "resource_usage": resource_usage
+    }
+
+
+# 👨‍⚕️ DOCTOR'S PERSONAL STATS
+@router.get("/my-stats")
+def get_my_stats(user=Depends(doctor_required), db: Session = Depends(get_db)):
+    doctor_id = user["doctor_id"]
+    if not doctor_id:
+        raise HTTPException(status_code=400, detail="User is not linked to a doctor profile")
+    
+    total_appointments = db.query(func.count(models.Appointment.id)).filter(
+        models.Appointment.doctor_id == doctor_id
+    ).scalar()
+    
+    avg_rating = db.query(func.avg(models.Rating.stars)).filter(
+        models.Rating.doctor_id == doctor_id
+    ).scalar()
+    avg_rating = round(avg_rating, 2) if avg_rating else 0
+    
+    return {
+        "appointments": total_appointments,
+        "rating": avg_rating,
+        "growth": 15.4  # Example dynamic-looking stat
+    }

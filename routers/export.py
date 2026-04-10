@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from database import get_db
 import pandas as pd
@@ -24,4 +25,8 @@ def export_doctor_data(doctor_id: int, db: Session = Depends(get_db)):
     file_path = f"doctor_{doctor_id}.xlsx"
     df.to_excel(file_path, index=False)
 
-    return {"file": file_path}
+    return FileResponse(
+        file_path, 
+        filename=file_path, 
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )

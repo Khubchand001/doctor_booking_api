@@ -15,7 +15,7 @@ def get_all(db: Session = Depends(get_db)):
 
 # ✅ Doctor: see own patients only
 @router.get("/my")
-def my_patients(user=Depends(get_current_user), db: Session = Depends(get_db)):
+def my_patients(user=Depends(doctor_required), db: Session = Depends(get_db)):
     return crud.get_appointments_by_doctor(db, user["doctor_id"])
 
 
