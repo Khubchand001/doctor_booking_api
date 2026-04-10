@@ -87,3 +87,14 @@ class DoctorUpdate(BaseModel):
     specialization: Optional[str] = None
     experience: Optional[str] = None
     image: Optional[str] = None
+
+
+class AppointmentUpdate(BaseModel):
+    patient_name: Optional[str] = None
+    age: Optional[int] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    report: Optional[str] = None
+    doctor_id: Optional[int] = None

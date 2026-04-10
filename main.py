@@ -13,7 +13,8 @@ from routers import (
     availability,
     ratings,
     upload,
-    export
+    export,
+    slots
 )
 
 # Initialize Database
@@ -48,6 +49,7 @@ app.include_router(export.router)
 # ✅ 4. Misc
 app.include_router(ratings.router)
 app.include_router(upload.router)
+app.include_router(slots.router)
 
 
 @app.get("/")
