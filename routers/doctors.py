@@ -52,3 +52,23 @@ def update_profile(
     db.commit()
     db.refresh(db_doctor)
     return db_doctor
+
+
+# ✅ 5. ADMIN UPDATE DOCTOR (Admin only)
+@router.patch("/{doctor_id}", dependencies=[Depends(admin_required)])
+def admin_update_doctor(
+    doctor_id: int,
+    profile: schemas.DoctorUpdate,
+    db: Session = Depends(get_db)
+):
+    db_doctor = crud.get_doctor(db, doctor_id)
+    if not db_doctor:
+        raise HTTPException(status_code=404, detail="Doctor not found")
+        
+    # Update fields
+    for field, value in profile.dict(exclude_unset=True).items():
+        setattr(db_doctor, field, value)
+        
+    db.commit()
+    db.refresh(db_doctor)
+    return db_doctor
