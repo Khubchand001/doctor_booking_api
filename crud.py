@@ -21,7 +21,8 @@ def get_doctor(db: Session, doctor_id: int):
 # ---------------- APPOINTMENT ---------------- #
 
 def create_appointment(db: Session, appointment):
-
+    print(f"DEBUG: Attempting to create appointment for doctor {appointment.doctor_id} on {appointment.date} at {appointment.time}")
+    
     # 🚨 Prevent double booking
     existing = db.query(models.Appointment).filter(
         models.Appointment.doctor_id == appointment.doctor_id,
@@ -30,6 +31,7 @@ def create_appointment(db: Session, appointment):
     ).first()
 
     if existing:
+        print("DEBUG: Appointment slot already booked!")
         raise Exception("Slot already booked")
 
     new_app = models.Appointment(**appointment.dict())
@@ -37,6 +39,7 @@ def create_appointment(db: Session, appointment):
     db.commit()
     db.refresh(new_app)
 
+    print(f"DEBUG: Appointment created successfully with ID: {new_app.id}")
     return new_app
 
 

@@ -8,3 +8,4 @@ openpyxl
 python-jose 
 bcrypt==3.2.0
 passlib[bcrypt]
+python-dotenv

@@ -1,9 +1,14 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "sqlite:///./doctor.db"
-SECRET_KEY = "secret123"
-ALGORITHM = "HS256"
+# Load environment variables
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./doctor.db")
+SECRET_KEY = os.getenv("SECRET_KEY", "secret123")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
 engine = create_engine(
     DATABASE_URL,
