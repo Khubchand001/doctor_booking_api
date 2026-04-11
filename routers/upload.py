@@ -13,7 +13,7 @@ def upload_image(file: UploadFile = File(...)):
     path = f"{UPLOAD_DIR}/{file.filename}"
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    return {"image_url": path}
+    return {"image_url": file.filename}
 
 
 @router.post("/pdf")
@@ -21,4 +21,4 @@ def upload_pdf(file: UploadFile = File(...)):
     path = f"{UPLOAD_DIR}/{file.filename}"
     with open(path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    return {"file_url": path}
+    return {"file_url": file.filename}
